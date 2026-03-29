@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anything.lk Marketplace</title>
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif; margin: 0; 
+            background: url('https://png.pngtree.com/thumb_back/fw800/background/20230610/pngtree-purple-texture-background-images-hd-pictures-and-wallpaper-image_2951717.jpg') no-repeat center center fixed; 
+            background-size: cover; color: #fff; overflow-x: hidden;
+        }
+
+        header { background: #000; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        header span { font-size: 35px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; }
+
+        .screen { display: none; padding: 20px; animation: fadeIn 0.4s ease-in; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .black-section { background: #000; margin: -20px -20px 20px -20px; padding: 20px; border-bottom: 1px solid #222; }
+
+        /* Home Buttons */
+        .home-container { display: flex; flex-direction: column; align-items: center; gap: 20px; padding-top: 50px; }
+        .main-btn { width: 85%; max-width: 350px; padding: 18px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; text-transform: uppercase; box-shadow: 0 8px 25px rgba(0,0,0,0.5); transition: 0.3s; }
+        .btn-buy { background: #fff; color: #4b0082; }
+        .btn-sell { background: #8e60b5; color: #fff; }
+
+        /* Admin Login Button */
+        .admin-nav-btn {
+            background: rgba(34, 34, 34, 0.8);
+            color: #777; 
+            border: 1px solid #333;
+            padding: 10px 20px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-top: 40px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* Form Controls */
+        .box { background: rgba(0,0,0,0.9); padding: 25px; border-radius: 20px; max-width: 400px; margin: auto; border: 1px solid #333; }
+        input, select { 
+            width: 95%; padding: 12px; margin: 10px 0; border: 1px solid #444; 
+            background: #111; color: white; border-radius: 10px; appearance: none;
+        }
+        select option { background: #000; color: #fff; }
+
+        /* Category Navigation */
+        .category-bar { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+        .cat-btn { background: transparent; border: 1.5px solid #fff; color: white; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap; }
+        .cat-btn.active-cat { background: #fff; color: #000; }
+
+        /* Product Display */
+        #list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .card { background: rgba(0,0,0,0.8); padding: 12px; border-radius: 15px; border: 1px solid #222; text-align: center; }
+        .card img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; }
+
+        .back-btn { background: #fff; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .admin-only { display: none; }
+        .admin-mode .admin-only { display: block; }
+    </style>
+</head>
+<body id="main-body">
+
+    <header><span>ANYTHING.LK</span></header>
+
+    <div id="home-screen" class="screen active">
+        <div class="home-container">
+            <button class="main-btn btn-buy" onclick="showScreen('buy-screen')">🛒 BROWSE MARKET</button>
+            <button class="main-btn btn-sell" onclick="showScreen('sell-screen')">➕ POST AN AD</button>
+            <button class="admin-nav-btn" onclick="showScreen('login-screen')">ADMIN LOGIN</button>
+        </div>
+    </div>
+
+    <div id="login-screen" class="screen">
+        <div class="box">
+            <h2 style="text-align:center;">Admin Access</h2>
+            <input type="text" id="user" placeholder="Username">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="main-btn btn-buy" style="width:100%" onclick="login()">LOGIN</button>
+            <button onclick="showScreen('home-screen')" style="width:100%; margin-top:10px; background:none; color:white; border:none; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <div id="buy-screen" class="screen">
+        <div class="black-section">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <button class="back-btn" onclick="showScreen('home-screen')">BACK</button>
+                <h2 style="margin:0;">Marketplace</h2>
+                <button class="admin-only" style="background:#0088ff; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;" onclick="showScreen('manage-cat-screen')">⚙️ Categories</button>
+            </div>
+            <div class="category-bar" id="filter-bar"></div>
+        </div>
+        <div id="list">Loading...</div>
+    </div>
+
+    <div id="sell-screen" class="screen">
+        <div class="black-section">
+            <button class="back-btn" onclick="showScreen('home-screen')">BACK</button>
+            <h2 style="display:inline; margin-left:15px;">Post Ad</h2>
+        </div>
+        <div class="box">
+            <input type="text" id="title" placeholder="Item Name">
+            <input type="number" id="price" placeholder="Price (Rs.)">
+            <select id="post-cat"></select>
+            <input type="file" id="imgInp" accept="image/*">
+            <button class="main-btn btn-sell" style="width:100%" id="pub" onclick="publish()">🚀 LIST IT NOW</button>
+        </div>
+    </div>
+
+    <div id="manage-cat-screen" class="screen">
+        <div class="black-section">
+            <button class="back-btn" onclick="showScreen('buy-screen')">BACK</button>
+            <h2 style="display:inline; margin-left:15px;">Manage Categories</h2>
+        </div>
+        <div class="box">
+            <input type="text" id="new-cat-name" placeholder="Category Name">
+            <button class="main-btn btn-buy" style="width:100%" onclick="addCategory()">ADD CATEGORY</button>
+            <hr style="margin:20px 0; border:0.5px solid #333;">
+            <div id="cat-list-admin"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxuxJas8r3_RWcq-Pc-oXpsesVPc-CEHo",
+            authDomain: "anything-5beb7.firebaseapp.com",
+            databaseURL: "https://anything-5beb7-default-rtdb.firebaseio.com",
+            projectId: "anything-5beb7",
+            appId: "1:259245621399:web:fc9e2013c0df90009aa9d2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const IMG_KEY = "b5c90bc5900ba7e407f4467601971745";
+        let isAdmin = false;
+
+        window.showScreen = (id) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        };
+
+        window.login = () => {
+            if(document.getElementById('user').value === "anything.lk" && document.getElementById('pass').value === "9999") {
+                isAdmin = true;
+                document.getElementById('main-body').classList.add('admin-mode');
+                alert("Admin Access Granted!");
+                showScreen('buy-screen');
+            } else alert("Invalid Login!");
+        };
+
+        // --- Categories Handling ---
+        onValue(ref(db, 'categories'), (snap) => {
+            const cats = [];
+            snap.forEach(c => { cats.push({id: c.key, name: c.val().name}); });
+            
+            // Filter Bar
+            const fBar = document.getElementById('filter-bar');
+            fBar.innerHTML = `<button class="cat-btn active-cat" onclick="filterAds('All', this)">All</button>`;
+            cats.forEach(c => fBar.innerHTML += `<button class="cat-btn" onclick="filterAds('${c.name}', this)">${c.name}</button>`);
+
+            // Sell Dropdown
+            const pCat = document.getElementById('post-cat');
+            pCat.innerHTML = cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+            // Admin List
+            const aList = document.getElementById('cat-list-admin');
+            aList.innerHTML = cats.map(c => `
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; background:#111; padding:10px; border-radius:8px;">
+                    <span>${c.name}</span>
+                    <button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; border-radius:4px; padding:2px 8px; cursor:pointer;">Remove</button>
+                </div>`).join('');
+        });
+
+        window.addCategory = () => {
+            const name = document.getElementById('new-cat-name').value;
+            if(name) { set(push(ref(db, 'categories')), { name: name }); document.getElementById('new-cat-name').value = ""; }
+        };
+
+        window.deleteCategory = (id) => { if(confirm("Delete this category?")) remove(ref(db, 'categories/' + id)); };
+
+        // --- Ads Handling ---
+        window.publish = async () => {
+            const f = document.getElementById('imgInp').files[0];
+            const btn = document.getElementById('pub');
+            if(!f || !document.getElementById('title').value) return alert("Fill all details!");
+            
+            btn.innerText = "Posting..."; btn.disabled = true;
+            let fd = new FormData(); fd.append("image", f);
+            
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMG_KEY}`, { method: "POST", body: fd });
+                const data = await res.json();
+
+                await set(push(ref(db, 'ads')), {
+                    name: document.getElementById('title').value,
+                    price: document.getElementById('price').value,
+                    category: document.getElementById('post-cat').value,
+                    img: data.data.url, time: Date.now(), pinned: false
+                });
+                alert("Ad Success!"); showScreen('buy-screen');
+            } catch (e) { alert("Upload Failed!"); }
+            btn.disabled = false; btn.innerText = "🚀 LIST IT NOW";
+        };
+
+        let allAds = [];
+        onValue(ref(db, 'ads'), (snap) => {
+            allAds = []; snap.forEach(c => { allAds.push({id: c.key, ...c.val()}); });
+            renderAds(allAds);
+        });
+
+        window.renderAds = (ads) => {
+            const list = document.getElementById('list');
+            list.innerHTML = "";
+            ads.sort((a,b) => (b.pinned - a.pinned) || (b.time - a.time)).forEach(item => {
+                list.innerHTML += `
+                    <div class="card">
+                        <img src="${item.img}">
+                        <h4 style="margin:10px 0 5px;">${item.name}</h4>
+                        <p style="color:#00ff00; font-weight:bold;">Rs. ${item.price}</p>
+                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; margin-top:5px; cursor:pointer;">Delete</button>` : ''}
+                    </div>`;
+            });
+        };
+
+        window.filterAds = (cat, btn) => {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active-cat'));
+            btn.classList.add('active-cat');
+            renderAds(cat === 'All' ? allAds : allAds.filter(a => a.category === cat));
+        };
+
+        window.deleteAd = (id) => { if(confirm("Delete Ad?")) remove(ref(db, 'ads/' + id)); };
+    </script>
+</body>
+</html>
