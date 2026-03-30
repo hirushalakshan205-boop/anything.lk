@@ -20,20 +20,9 @@
 
         .black-section { background: #000; margin: -20px -20px 20px -20px; padding: 20px; border-bottom: 1px solid #222; }
 
-        /* Ad Container Styling */
-        .ad-container {
-            width: 100%;
-            text-align: center;
-            margin: 15px 0;
-            min-height: 50px;
-            background: rgba(0,0,0,0.4);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
         /* Home Buttons */
         .home-container { display: flex; flex-direction: column; align-items: center; gap: 20px; padding-top: 50px; }
-        .main-btn { width: 85%; max-width: 350px; padding: 18px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; text-transform: uppercase; box-shadow: 0 8px 25px rgba(0,0,0,0.5); transition: 0.3s; }
+        .main-btn { width: 85%; max-width: 350px; padding: 18px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; text-transform: uppercase; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
         .btn-buy { background: #fff; color: #4b0082; }
         .btn-sell { background: #8e60b5; color: #fff; }
 
@@ -43,7 +32,7 @@
             margin-top: 40px; cursor: pointer; text-transform: uppercase;
         }
 
-        /* Select/Dropdown Fix */
+        /* Form Inputs & Select Fix */
         .box { background: rgba(0,0,0,0.9); padding: 25px; border-radius: 20px; max-width: 400px; margin: auto; border: 1px solid #333; }
         input, select { 
             width: 95%; padding: 12px; margin: 10px 0; border: 1px solid #444; 
@@ -55,16 +44,29 @@
         .cat-btn { background: transparent; border: 1.5px solid #fff; color: white; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap; }
         .cat-btn.active-cat { background: #fff; color: #000; }
 
-        #list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        #list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding-bottom: 100px; }
         .card { background: rgba(0,0,0,0.8); padding: 12px; border-radius: 15px; border: 1px solid #222; text-align: center; }
         .card img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; }
 
         .back-btn { background: #fff; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .admin-only { display: none; }
         .admin-mode .admin-only { display: block; }
+
+        /* Mobile Overlay Ad Container */
+        #mobile-ad-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
+            text-align: center;
+            line-height: 0;
+        }
     </style>
 </head>
 <body id="main-body">
+
+    <script src="https://pl29015647.profitablecpmratenetwork.com/8c/da/80/8cda80fee130449719e6e901610aded0.js"></script>
 
     <header><span>ANYTHING.LK</span></header>
 
@@ -88,12 +90,6 @@
 
     <div id="buy-screen" class="screen">
         <div class="black-section">
-            
-            <div class="ad-container">
-                <script async="async" data-cfasync="false" src="https://pl29015546.profitablecpmratenetwork.com/f5ab5e35c967dcc3125b27ecb3837b59/invoke.js"></script>
-                <div id="container-f5ab5e35c967dcc3125b27ecb3837b59"></div>
-            </div>
-
             <div style="display:flex; align-items:center; justify-content:space-between;">
                 <button class="back-btn" onclick="showScreen('home-screen')">BACK</button>
                 <h2 style="margin:0;">Marketplace</h2>
@@ -101,14 +97,7 @@
             </div>
             <div class="category-bar" id="filter-bar"></div>
         </div>
-
-        <div id="list">Loading items...</div>
-
-        <div class="ad-container" style="margin-top:20px;">
-            <p style="font-size:10px; color:#444; margin:5px;">ADVERTISEMENT</p>
-            <div id="container-f5ab5e35c967dcc3125b27ecb3837b59-2">
-                </div>
-        </div>
+        <div id="list">Loading...</div>
     </div>
 
     <div id="sell-screen" class="screen">
@@ -131,7 +120,7 @@
             <h2 style="display:inline; margin-left:15px;">Categories</h2>
         </div>
         <div class="box">
-            <input type="text" id="new-cat-name" placeholder="New Category Name">
+            <input type="text" id="new-cat-name" placeholder="Category Name">
             <button class="main-btn btn-buy" style="width:100%" onclick="addCategory()">ADD</button>
             <hr style="margin:20px 0; border:0.5px solid #333;">
             <div id="cat-list-admin"></div>
@@ -140,7 +129,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBxuxJas8r3_RWcq-Pc-oXpsesVPc-CEHo",
@@ -166,7 +155,7 @@
                 document.getElementById('main-body').classList.add('admin-mode');
                 alert("Admin Access Granted!");
                 showScreen('buy-screen');
-            } else alert("Wrong Login!");
+            } else alert("Invalid Login!");
         };
 
         onValue(ref(db, 'categories'), (snap) => {
@@ -186,12 +175,12 @@
             if(name) { set(push(ref(db, 'categories')), { name: name }); document.getElementById('new-cat-name').value = ""; }
         };
 
-        window.deleteCategory = (id) => { if(confirm("Delete?")) remove(ref(db, 'categories/' + id)); };
+        window.deleteCategory = (id) => { if(confirm("Delete Category?")) remove(ref(db, 'categories/' + id)); };
 
         window.publish = async () => {
             const f = document.getElementById('imgInp').files[0];
             const btn = document.getElementById('pub');
-            if(!f || !document.getElementById('title').value) return alert("Please fill all fields!");
+            if(!f || !document.getElementById('title').value) return alert("Fill all fields!");
             btn.innerText = "Uploading..."; btn.disabled = true;
             let fd = new FormData(); fd.append("image", f);
             const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMG_KEY}`, { method: "POST", body: fd });
