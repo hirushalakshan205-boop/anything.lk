@@ -20,40 +20,41 @@
 
         .black-section { background: #000; margin: -20px -20px 20px -20px; padding: 20px; border-bottom: 1px solid #222; }
 
+        /* Ad Container Styling */
+        .ad-container {
+            width: 100%;
+            text-align: center;
+            margin: 15px 0;
+            min-height: 50px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
         /* Home Buttons */
         .home-container { display: flex; flex-direction: column; align-items: center; gap: 20px; padding-top: 50px; }
         .main-btn { width: 85%; max-width: 350px; padding: 18px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; text-transform: uppercase; box-shadow: 0 8px 25px rgba(0,0,0,0.5); transition: 0.3s; }
         .btn-buy { background: #fff; color: #4b0082; }
         .btn-sell { background: #8e60b5; color: #fff; }
 
-        /* Admin Login Button */
         .admin-nav-btn {
-            background: rgba(34, 34, 34, 0.8);
-            color: #777; 
-            border: 1px solid #333;
-            padding: 10px 20px;
-            font-size: 12px;
-            font-weight: bold;
-            border-radius: 8px;
-            margin-top: 40px;
-            cursor: pointer;
-            text-transform: uppercase;
+            background: rgba(34, 34, 34, 0.8); color: #777; border: 1px solid #333;
+            padding: 10px 20px; font-size: 12px; font-weight: bold; border-radius: 8px;
+            margin-top: 40px; cursor: pointer; text-transform: uppercase;
         }
 
-        /* Form Controls */
+        /* Select/Dropdown Fix */
         .box { background: rgba(0,0,0,0.9); padding: 25px; border-radius: 20px; max-width: 400px; margin: auto; border: 1px solid #333; }
         input, select { 
             width: 95%; padding: 12px; margin: 10px 0; border: 1px solid #444; 
-            background: #111; color: white; border-radius: 10px; appearance: none;
+            background: #111 !important; color: white !important; border-radius: 10px; appearance: none;
         }
-        select option { background: #000; color: #fff; }
+        select option { background: #000 !important; color: #fff !important; }
 
-        /* Category Navigation */
         .category-bar { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
         .cat-btn { background: transparent; border: 1.5px solid #fff; color: white; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap; }
         .cat-btn.active-cat { background: #fff; color: #000; }
 
-        /* Product Display */
         #list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .card { background: rgba(0,0,0,0.8); padding: 12px; border-radius: 15px; border: 1px solid #222; text-align: center; }
         .card img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; }
@@ -87,6 +88,12 @@
 
     <div id="buy-screen" class="screen">
         <div class="black-section">
+            
+            <div class="ad-container">
+                <script async="async" data-cfasync="false" src="https://pl29015546.profitablecpmratenetwork.com/f5ab5e35c967dcc3125b27ecb3837b59/invoke.js"></script>
+                <div id="container-f5ab5e35c967dcc3125b27ecb3837b59"></div>
+            </div>
+
             <div style="display:flex; align-items:center; justify-content:space-between;">
                 <button class="back-btn" onclick="showScreen('home-screen')">BACK</button>
                 <h2 style="margin:0;">Marketplace</h2>
@@ -94,7 +101,14 @@
             </div>
             <div class="category-bar" id="filter-bar"></div>
         </div>
-        <div id="list">Loading...</div>
+
+        <div id="list">Loading items...</div>
+
+        <div class="ad-container" style="margin-top:20px;">
+            <p style="font-size:10px; color:#444; margin:5px;">ADVERTISEMENT</p>
+            <div id="container-f5ab5e35c967dcc3125b27ecb3837b59-2">
+                </div>
+        </div>
     </div>
 
     <div id="sell-screen" class="screen">
@@ -114,11 +128,11 @@
     <div id="manage-cat-screen" class="screen">
         <div class="black-section">
             <button class="back-btn" onclick="showScreen('buy-screen')">BACK</button>
-            <h2 style="display:inline; margin-left:15px;">Manage Categories</h2>
+            <h2 style="display:inline; margin-left:15px;">Categories</h2>
         </div>
         <div class="box">
-            <input type="text" id="new-cat-name" placeholder="Category Name">
-            <button class="main-btn btn-buy" style="width:100%" onclick="addCategory()">ADD CATEGORY</button>
+            <input type="text" id="new-cat-name" placeholder="New Category Name">
+            <button class="main-btn btn-buy" style="width:100%" onclick="addCategory()">ADD</button>
             <hr style="margin:20px 0; border:0.5px solid #333;">
             <div id="cat-list-admin"></div>
         </div>
@@ -128,7 +142,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBxuxJas8r3_RWcq-Pc-oXpsesVPc-CEHo",
             authDomain: "anything-5beb7.firebaseapp.com",
@@ -153,30 +166,19 @@
                 document.getElementById('main-body').classList.add('admin-mode');
                 alert("Admin Access Granted!");
                 showScreen('buy-screen');
-            } else alert("Invalid Login!");
+            } else alert("Wrong Login!");
         };
 
-        // --- Categories Handling ---
         onValue(ref(db, 'categories'), (snap) => {
             const cats = [];
             snap.forEach(c => { cats.push({id: c.key, name: c.val().name}); });
-            
-            // Filter Bar
             const fBar = document.getElementById('filter-bar');
             fBar.innerHTML = `<button class="cat-btn active-cat" onclick="filterAds('All', this)">All</button>`;
             cats.forEach(c => fBar.innerHTML += `<button class="cat-btn" onclick="filterAds('${c.name}', this)">${c.name}</button>`);
-
-            // Sell Dropdown
             const pCat = document.getElementById('post-cat');
             pCat.innerHTML = cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-
-            // Admin List
             const aList = document.getElementById('cat-list-admin');
-            aList.innerHTML = cats.map(c => `
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px; background:#111; padding:10px; border-radius:8px;">
-                    <span>${c.name}</span>
-                    <button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; border-radius:4px; padding:2px 8px; cursor:pointer;">Remove</button>
-                </div>`).join('');
+            aList.innerHTML = cats.map(c => `<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>${c.name}</span><button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; border-radius:4px; padding:2px 8px;">Del</button></div>`).join('');
         });
 
         window.addCategory = () => {
@@ -184,30 +186,23 @@
             if(name) { set(push(ref(db, 'categories')), { name: name }); document.getElementById('new-cat-name').value = ""; }
         };
 
-        window.deleteCategory = (id) => { if(confirm("Delete this category?")) remove(ref(db, 'categories/' + id)); };
+        window.deleteCategory = (id) => { if(confirm("Delete?")) remove(ref(db, 'categories/' + id)); };
 
-        // --- Ads Handling ---
         window.publish = async () => {
             const f = document.getElementById('imgInp').files[0];
             const btn = document.getElementById('pub');
-            if(!f || !document.getElementById('title').value) return alert("Fill all details!");
-            
-            btn.innerText = "Posting..."; btn.disabled = true;
+            if(!f || !document.getElementById('title').value) return alert("Please fill all fields!");
+            btn.innerText = "Uploading..."; btn.disabled = true;
             let fd = new FormData(); fd.append("image", f);
-            
-            try {
-                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMG_KEY}`, { method: "POST", body: fd });
-                const data = await res.json();
-
-                await set(push(ref(db, 'ads')), {
-                    name: document.getElementById('title').value,
-                    price: document.getElementById('price').value,
-                    category: document.getElementById('post-cat').value,
-                    img: data.data.url, time: Date.now(), pinned: false
-                });
-                alert("Ad Success!"); showScreen('buy-screen');
-            } catch (e) { alert("Upload Failed!"); }
-            btn.disabled = false; btn.innerText = "🚀 LIST IT NOW";
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMG_KEY}`, { method: "POST", body: fd });
+            const data = await res.json();
+            await set(push(ref(db, 'ads')), {
+                name: document.getElementById('title').value,
+                price: document.getElementById('price').value,
+                category: document.getElementById('post-cat').value,
+                img: data.data.url, time: Date.now(), pinned: false
+            });
+            alert("Success!"); showScreen('buy-screen'); btn.disabled = false; btn.innerText = "🚀 LIST IT NOW";
         };
 
         let allAds = [];
@@ -220,13 +215,7 @@
             const list = document.getElementById('list');
             list.innerHTML = "";
             ads.sort((a,b) => (b.pinned - a.pinned) || (b.time - a.time)).forEach(item => {
-                list.innerHTML += `
-                    <div class="card">
-                        <img src="${item.img}">
-                        <h4 style="margin:10px 0 5px;">${item.name}</h4>
-                        <p style="color:#00ff00; font-weight:bold;">Rs. ${item.price}</p>
-                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; margin-top:5px; cursor:pointer;">Delete</button>` : ''}
-                    </div>`;
+                list.innerHTML += `<div class="card"><img src="${item.img}"><h4>${item.name}</h4><p style="color:#00ff00;">Rs. ${item.price}</p>${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; color:white; border:none; padding:5px; border-radius:5px; margin-top:5px; cursor:pointer;">Delete</button>` : ''}</div>`;
             });
         };
 
