@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anything.lk Marketplace</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { 
             font-family: 'Poppins', sans-serif; margin: 0; 
@@ -12,94 +12,69 @@
             background-size: cover; color: #fff; overflow-x: hidden;
         }
 
-        header { background: #000; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        header span { font-size: 30px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #fff; }
+        header { background: #000; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; z-index: 9999; }
+        header span { font-size: 28px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
 
-        .screen { display: none; padding: 20px; animation: fadeIn 0.4s ease-in; }
+        .screen { display: none; padding: 20px; animation: fadeIn 0.4s ease-in; position: relative; z-index: 999; }
         .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .black-section { background: #000; margin: -20px -20px 20px -20px; padding: 20px; border-bottom: 1px solid #222; }
 
-        /* Form Styling */
         .box { background: rgba(0,0,0,0.9); padding: 25px; border-radius: 20px; max-width: 400px; margin: auto; border: 1px solid #333; }
         input, select { 
             width: 95%; padding: 12px; margin: 10px 0; border: 1px solid #444; 
             background: #111 !important; color: white !important; border-radius: 10px; outline: none;
         }
-        select option { background: #000 !important; color: #fff !important; }
 
-        /* Buttons */
-        .main-btn { width: 85%; max-width: 350px; padding: 18px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; text-transform: uppercase; box-shadow: 0 8px 25px rgba(0,0,0,0.5); display: block; margin: 15px auto; transition: 0.3s; }
+        .main-btn, .wa-link, .back-btn, .cat-btn { 
+            position: relative !important; z-index: 10000 !important; cursor: pointer !important; text-decoration: none;
+        }
+
+        .main-btn { 
+            width: 85%; max-width: 350px; padding: 18px; border: none; border-radius: 12px; 
+            font-weight: 800; text-transform: uppercase; text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5); display: block; margin: 15px auto; 
+        }
         .btn-buy { background: #fff; color: #4b0082; }
         .btn-sell { background: #8e60b5; color: #fff; }
-        .back-btn { background: #fff; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* WhatsApp Button */
-        .wa-btn {
-            background: #25D366; color: white; border: none; padding: 10px; 
-            border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer;
+        .wa-link {
+            background: #25D366; color: white; padding: 12px; 
+            border-radius: 8px; width: 90%; font-weight: bold;
             margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
 
-        /* Marketplace Grid */
-        #list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding-bottom: 120px; }
-        .card { background: rgba(0,0,0,0.8); padding: 12px; border-radius: 15px; border: 1px solid #222; text-align: center; }
+        #list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding-bottom: 150px; }
+        .card { background: rgba(0,0,0,0.8); padding: 12px; border-radius: 15px; border: 1px solid #222; text-align: center; display: flex; flex-direction: column; align-items: center; }
         .card img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; }
-        .card h4 { margin: 10px 0 5px; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .category-bar { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        .cat-btn { background: transparent; border: 1.5px solid #fff; color: white; padding: 10px 18px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+        .cat-btn { background: transparent; border: 1.5px solid #fff; color: white; padding: 10px 18px; border-radius: 8px; white-space: nowrap; }
         .cat-btn.active-cat { background: #fff; color: #000; }
 
-        /* Ad Containers */
-        .native-ad-scroll { width: 100%; text-align: center; margin: 30px 0; padding: 15px 0; background: rgba(0,0,0,0.6); border-radius: 10px; }
-        
-        .admin-only { display: none; }
-        .admin-mode .admin-only { display: block; }
+        .back-btn { background: #fff; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; }
+        .native-ad-scroll { width: 100%; text-align: center; margin: 30px 0; padding: 15px 0; position: relative; z-index: 998; }
     </style>
 </head>
-<body id="main-body">
+<body>
 
     <script src="https://pl29015647.profitablecpmratenetwork.com/8c/da/80/8cda80fee130449719e6e901610aded0.js"></script>
 
     <header><span>ANYTHING.LK</span></header>
 
     <div id="home-screen" class="screen active">
-        <div style="text-align:center; padding: 20px;">
-            <p>Welcome to Sri Lanka's Modern Marketplace</p>
-        </div>
         <button class="main-btn btn-buy" onclick="showScreen('buy-screen')">🛒 BROWSE MARKET</button>
         <button class="main-btn btn-sell" onclick="showScreen('sell-screen')">➕ POST AN AD</button>
-        <div style="text-align:center; margin-top: 50px;">
-            <button onclick="showScreen('login-screen')" style="background:none; border:none; color:#555; font-size:12px; cursor:pointer;">ADMIN LOGIN</button>
-        </div>
-    </div>
-
-    <div id="login-screen" class="screen">
-        <div class="box">
-            <h2 style="text-align:center;">Admin Access</h2>
-            <input type="text" id="user" placeholder="Username">
-            <input type="password" id="pass" placeholder="Password">
-            <button class="main-btn btn-buy" style="width:100%" onclick="login()">LOGIN</button>
-            <button onclick="showScreen('home-screen')" style="width:100%; margin-top:10px; background:none; color:white; border:none; cursor:pointer;">Cancel</button>
-        </div>
     </div>
 
     <div id="buy-screen" class="screen">
         <div class="black-section">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <button class="back-btn" onclick="showScreen('home-screen')">BACK</button>
-                <h2 style="margin:0;">Marketplace</h2>
-                <button class="admin-only" style="background:#0088ff; color:white; border:none; padding:8px 12px; border-radius:5px;" onclick="showScreen('manage-cat-screen')">⚙️</button>
-            </div>
+            <button class="back-btn" onclick="showScreen('home-screen')">BACK</button>
             <div class="category-bar" id="filter-bar"></div>
         </div>
-        
         <div id="list">Loading...</div>
-
         <div class="native-ad-scroll">
-            <p style="font-size:10px; color:#444; margin-bottom:10px;">ADVERTISEMENT</p>
             <script async="async" data-cfasync="false" src="https://pl29015546.profitablecpmratenetwork.com/f5ab5e35c967dcc3125b27ecb3837b59/invoke.js"></script>
             <div id="container-f5ab5e35c967dcc3125b27ecb3837b59"></div>
         </div>
@@ -108,34 +83,22 @@
     <div id="sell-screen" class="screen">
         <div class="black-section">
             <button class="back-btn" onclick="showScreen('home-screen')">BACK</button>
-            <h2 style="display:inline; margin-left:15px;">Post Your Ad</h2>
+            <h2 style="display:inline; margin-left:15px;">Post Ad</h2>
         </div>
         <div class="box">
             <input type="text" id="title" placeholder="Item Name">
             <input type="number" id="price" placeholder="Price (Rs.)">
-            <input type="number" id="wa-num" placeholder="WhatsApp (94771234567)">
-            <p style="font-size: 10px; color: #888; margin: -5px 0 10px 5px;">* රටේ කේතය (94) සමග ඇතුළත් කරන්න.</p>
+            <input type="text" id="wa-num" placeholder="WhatsApp (9477xxxxxxx)">
+            <p style="font-size: 10px; color: #888; margin: -5px 0 10px 5px;">* + ලකුණ නැතිව 94න් පටන් ගන්න (උදා: 94771234567)</p>
             <select id="post-cat"></select>
             <input type="file" id="imgInp" accept="image/*">
             <button class="main-btn btn-sell" style="width:100%" id="pub" onclick="publish()">🚀 POST NOW</button>
         </div>
     </div>
 
-    <div id="manage-cat-screen" class="screen">
-        <div class="black-section">
-            <button class="back-btn" onclick="showScreen('buy-screen')">BACK</button>
-            <h2 style="display:inline; margin-left:15px;">Categories</h2>
-        </div>
-        <div class="box">
-            <input type="text" id="new-cat-name" placeholder="Category Name">
-            <button class="main-btn btn-buy" style="width:100%" onclick="addCategory()">ADD</button>
-            <div id="cat-list-admin" style="margin-top:20px;"></div>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBxuxJas8r3_RWcq-Pc-oXpsesVPc-CEHo",
@@ -148,57 +111,35 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const IMG_KEY = "b5c90bc5900ba7e407f4467601971745";
-        let isAdmin = false;
 
         window.showScreen = (id) => {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
             window.scrollTo(0,0);
         };
 
-        window.login = () => {
-            if(document.getElementById('user').value === "anything.lk" && document.getElementById('pass').value === "9999") {
-                isAdmin = true;
-                document.getElementById('main-body').classList.add('admin-mode');
-                alert("Welcome Admin!");
-                showScreen('buy-screen');
-            } else alert("Access Denied!");
-        };
-
-        // Handle Categories
         onValue(ref(db, 'categories'), (snap) => {
             const cats = [];
-            snap.forEach(c => { cats.push({id: c.key, name: c.val().name}); });
-            
+            snap.forEach(c => cats.push(c.val().name));
+            document.getElementById('post-cat').innerHTML = cats.map(c => `<option>${c}</option>`).join('');
             const fBar = document.getElementById('filter-bar');
             fBar.innerHTML = `<button class="cat-btn active-cat" onclick="filterAds('All', this)">All</button>`;
-            cats.forEach(c => fBar.innerHTML += `<button class="cat-btn" onclick="filterAds('${c.name}', this)">${c.name}</button>`);
-            
-            document.getElementById('post-cat').innerHTML = cats.map(c => `<option>${c.name}</option>`).join('');
-            
-            const aList = document.getElementById('cat-list-admin');
-            aList.innerHTML = cats.map(c => `<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>${c.name}</span><button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; border-radius:4px; padding:2px 8px;">Del</button></div>`).join('');
+            cats.forEach(c => fBar.innerHTML += `<button class="cat-btn" onclick="filterAds('${c}', this)">${c}</button>`);
         });
 
-        window.addCategory = () => {
-            const name = document.getElementById('new-cat-name').value;
-            if(name) { set(push(ref(db, 'categories')), { name: name }); document.getElementById('new-cat-name').value = ""; }
-        };
-
-        window.deleteCategory = (id) => { if(confirm("Delete?")) remove(ref(db, 'categories/' + id)); };
-
-        // Post Ad Logic
         window.publish = async () => {
             const f = document.getElementById('imgInp').files[0];
             const title = document.getElementById('title').value;
             const price = document.getElementById('price').value;
-            const phone = document.getElementById('wa-num').value;
+            let phone = document.getElementById('wa-num').value;
             const btn = document.getElementById('pub');
 
-            if(!f || !title || !price || !phone) return alert("Please fill all details!");
+            if(!f || !title || !price || !phone) return alert("Fill all fields!");
+
+            // මෙතනදී අපි '+' ලකුණ තිබේ නම් එය අයින් කරලා සුද්ධ කරනවා
+            phone = phone.replace('+', '').replace(/\s/g, ''); 
 
             btn.innerText = "Processing..."; btn.disabled = true;
-
             let fd = new FormData(); fd.append("image", f);
             const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMG_KEY}`, { method: "POST", body: fd });
             const data = await res.json();
@@ -208,19 +149,15 @@
                 price: price,
                 phone: phone,
                 category: document.getElementById('post-cat').value,
-                img: data.data.url,
-                time: Date.now()
+                img: data.data.url, time: Date.now()
             });
-
-            alert("Ad Posted!"); showScreen('buy-screen');
+            alert("Success!"); showScreen('buy-screen');
             btn.innerText = "🚀 POST NOW"; btn.disabled = false;
         };
 
-        // Render Ads with WhatsApp Link
         let allAds = [];
         onValue(ref(db, 'ads'), (snap) => {
-            allAds = [];
-            snap.forEach(c => { allAds.push({id: c.key, ...c.val()}); });
+            allAds = []; snap.forEach(c => allAds.push({id: c.key, ...c.val()}));
             renderAds(allAds);
         });
 
@@ -228,16 +165,15 @@
             const list = document.getElementById('list');
             list.innerHTML = "";
             ads.sort((a,b) => b.time - a.time).forEach(item => {
-                const msg = encodeURIComponent(`Hello, I'm interested in: ${item.name}\nPrice: Rs. ${item.price}\nIs this still available?`);
+                const msg = encodeURIComponent(`Hello, I'm interested in: ${item.name} (Rs. ${item.price})`);
                 const waLink = `https://wa.me/${item.phone}?text=${msg}`;
-
+                
                 list.innerHTML += `
                     <div class="card">
                         <img src="${item.img}">
                         <h4>${item.name}</h4>
-                        <p style="color:#00ff00; font-weight:bold;">Rs. ${item.price}</p>
-                        <button class="wa-btn" onclick="window.open('${waLink}', '_blank')">💬 WhatsApp</button>
-                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; border:none; color:white; margin-top:5px; border-radius:5px; padding:3px; width:100%; cursor:pointer;">Delete</button>` : ''}
+                        <p style="color:#00ff00;">Rs. ${item.price}</p>
+                        <a href="${waLink}" class="wa-link" target="_blank">💬 WhatsApp</a>
                     </div>`;
             });
         };
@@ -247,8 +183,6 @@
             btn.classList.add('active-cat');
             renderAds(cat === 'All' ? allAds : allAds.filter(a => a.category === cat));
         };
-
-        window.deleteAd = (id) => { if(confirm("Delete this ad?")) remove(ref(db, 'ads/' + id)); };
     </script>
 </body>
 </html>
