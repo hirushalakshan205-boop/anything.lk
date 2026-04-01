@@ -149,7 +149,6 @@
         const IMG_KEY = "b5c90bc5900ba7e407f4467601971745";
         let isAdmin = false;
 
-        // සියලුම functions window object එකට සම්බන්ධ කළා
         window.showScreen = (id) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -160,10 +159,10 @@
             if(document.getElementById('user').value === "anything.lk" && document.getElementById('pass').value === "9999") {
                 isAdmin = true;
                 document.getElementById('main-body').classList.add('admin-mode');
-                alert("Welcome Admin!");
+                alert("Admin Access Granted!");
                 showScreen('buy-screen');
-                renderAds(allAds); // Admin වුණාම Delete buttons පේන්න refresh කරනවා
-            } else alert("Invalid Login!");
+                renderAds(allAds);
+            } else alert("Invalid Credentials!");
         };
 
         onValue(ref(db, 'categories'), (snap) => {
@@ -175,7 +174,7 @@
             cats.forEach(c => fBar.innerHTML += `<button class="cat-btn" onclick="filterAds('${c.name}', this)">${c.name}</button>`);
             const aList = document.getElementById('cat-list-admin');
             aList.innerHTML = cats.map(c => `
-                <div class="cat-item"><span>${c.name}</span><button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; padding:5px; border-radius:5px;">DEL</button></div>
+                <div class="cat-item"><span>${c.name}</span><button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">DEL</button></div>
             `).join('');
         });
 
@@ -184,9 +183,9 @@
             if(name) { push(ref(db, 'categories'), { name: name }); document.getElementById('new-cat-name').value = ""; }
         };
 
-        window.deleteCategory = (id) => { if(confirm("Delete Category?")) remove(ref(db, 'categories/' + id)); };
+        window.deleteCategory = (id) => { if(confirm("Delete this Category?")) remove(ref(db, 'categories/' + id)); };
 
-        // --- FIXED IMAGE COMPRESSION & PREVIEW ---
+        // --- උසස් මට්ටමේ පින්තූර සම්පීඩනය (Compression) ---
         const compressImage = (file) => {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -194,13 +193,14 @@
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 600; 
                         let width = img.width;
                         let height = img.height;
-                        const max = 800;
-                        if (width > max) { height *= max / width; width = max; }
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                         canvas.width = width; canvas.height = height;
-                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.7);
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.5);
                     };
                     img.src = e.target.result;
                 };
@@ -215,24 +215,30 @@
             let phone = document.getElementById('wa-num').value;
             const btn = document.getElementById('pub');
 
-            if(!fileInp.files[0] || !title || !price || !phone) return alert("All fields are required!");
+            if(!fileInp.files[0] || !title || !price || !phone) return alert("කරුණාකර සියල්ල පුරවන්න!");
             phone = phone.replace('+', '').replace(/\s/g, ''); 
-
-            btn.innerText = "Processing..."; btn.disabled = true;
+            
+            btn.innerText = "Processing Ad..."; 
+            btn.disabled = true;
 
             try {
                 const compressed = await compressImage(fileInp.files[0]);
-                let fd = new FormData(); fd.append("image", compressed);
+                let fd = new FormData(); 
+                fd.append("image", compressed, "product.jpg");
+
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMG_KEY}`, { method: "POST", body: fd });
                 const data = await res.json();
 
-                await push(ref(db, 'ads'), {
-                    name: title, price: price, phone: phone,
-                    category: document.getElementById('post-cat').value,
-                    img: data.data.url, time: Date.now()
-                });
-                alert("Success!"); showScreen('buy-screen');
-            } catch (e) { alert("Error uploading!"); }
+                if(data.success) {
+                    await push(ref(db, 'ads'), {
+                        name: title, price: price, phone: phone,
+                        category: document.getElementById('post-cat').value,
+                        img: data.data.url, time: Date.now()
+                    });
+                    alert("Ad එක සාර්ථකව පලකලා!"); 
+                    showScreen('buy-screen');
+                } else alert("Upload Failed!");
+            } catch (e) { alert("Error: " + e.message); }
             finally { btn.innerText = "🚀 PUBLISH NOW"; btn.disabled = false; }
         };
 
@@ -246,14 +252,14 @@
             const list = document.getElementById('list');
             list.innerHTML = "";
             ads.sort((a,b) => b.time - a.time).forEach(item => {
-                const waLink = `https://wa.me/${item.phone}?text=Interested%20in%20${item.name}`;
+                const waLink = `https://wa.me/${item.phone}?text=Interested%20in:%20${item.name}`;
                 list.innerHTML += `
                     <div class="card">
                         <img src="${item.img}">
                         <h4>${item.name}</h4>
-                        <p style="color:#00ff00;">Rs. ${item.price}</p>
+                        <p style="color:#00ff00; font-weight:bold;">Rs. ${item.price}</p>
                         <a href="${waLink}" class="wa-link" target="_blank">💬 WhatsApp</a>
-                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; color:white; margin-top:8px; padding:5px; width:90%; border-radius:5px; border:none; cursor:pointer; position:relative; z-index:99999;">DELETE AD</button>` : ''}
+                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; color:white; margin-top:8px; padding:5px; width:90%; border-radius:5px; border:none; cursor:pointer;">DELETE AD</button>` : ''}
                     </div>`;
             });
         };
