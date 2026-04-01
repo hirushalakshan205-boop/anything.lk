@@ -12,23 +12,23 @@
             background-size: cover; color: #fff; overflow-x: hidden;
         }
 
-        header { background: #000; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; z-index: 9999; }
-        header span { font-size: 28px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
+        header { background: #000; padding: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; z-index: 9999; }
+        header span { font-size: 26px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
 
-        .screen { display: none; padding: 20px; animation: fadeIn 0.4s ease-in; position: relative; z-index: 999; }
+        .screen { display: none; padding: 20px; animation: fadeIn 0.4s ease-in; position: relative; z-index: 1000; }
         .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .black-section { background: #000; margin: -20px -20px 20px -20px; padding: 20px; border-bottom: 1px solid #222; }
 
-        .box { background: rgba(0,0,0,0.9); padding: 25px; border-radius: 20px; max-width: 400px; margin: auto; border: 1px solid #333; }
+        .box { background: rgba(0,0,0,0.95); padding: 25px; border-radius: 20px; max-width: 400px; margin: auto; border: 1px solid #333; }
         input, select { 
             width: 95%; padding: 12px; margin: 10px 0; border: 1px solid #444; 
             background: #111 !important; color: white !important; border-radius: 10px; outline: none;
         }
 
-        .main-btn, .wa-link, .back-btn, .cat-btn, .admin-nav-btn { 
-            position: relative !important; z-index: 10000 !important; cursor: pointer !important; text-decoration: none;
+        .main-btn, .wa-link, .back-btn, .cat-btn, .admin-nav-link { 
+            position: relative !important; z-index: 10001 !important; cursor: pointer !important; text-decoration: none;
         }
 
         .main-btn { 
@@ -39,11 +39,9 @@
         .btn-buy { background: #fff; color: #4b0082; }
         .btn-sell { background: #8e60b5; color: #fff; }
 
-        /* Admin Navigation Button */
-        .admin-nav-btn {
-            background: rgba(255, 255, 255, 0.1); color: #aaa; border: 1px solid #444;
-            padding: 10px 20px; font-size: 13px; font-weight: bold; border-radius: 8px;
-            margin: 40px auto 0; display: block; width: fit-content; text-transform: uppercase;
+        .admin-nav-link {
+            display: block; text-align: right; font-size: 11px; color: #666; 
+            margin-bottom: 20px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
         }
 
         .wa-link {
@@ -61,8 +59,14 @@
         .cat-btn.active-cat { background: #fff; color: #000; }
 
         .back-btn { background: #fff; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; }
+        
         .admin-only { display: none; }
         .admin-mode .admin-only { display: block; }
+
+        .cat-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #111; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #222;
+        }
     </style>
 </head>
 <body id="main-body">
@@ -72,19 +76,19 @@
     <header><span>ANYTHING.LK</span></header>
 
     <div id="home-screen" class="screen active">
-        <div style="height: 50px;"></div> <button class="main-btn btn-buy" onclick="showScreen('buy-screen')">🛒 BROWSE MARKET</button>
+        <div class="admin-nav-link" onclick="showScreen('login-screen')">Admin Access ○</div>
+        <div style="height: 20px;"></div>
+        <button class="main-btn btn-buy" onclick="showScreen('buy-screen')">🛒 BROWSE MARKET</button>
         <button class="main-btn btn-sell" onclick="showScreen('sell-screen')">➕ POST AN AD</button>
-        
-        <button class="admin-nav-btn" onclick="showScreen('login-screen')">ADMIN LOGIN</button>
     </div>
 
     <div id="login-screen" class="screen">
         <div class="box">
-            <h2 style="text-align:center;">Admin Access</h2>
+            <h2 style="text-align:center;">Staff Login</h2>
             <input type="text" id="user" placeholder="Username">
             <input type="password" id="pass" placeholder="Password">
-            <button class="main-btn btn-buy" style="width:100%" onclick="login()">LOGIN</button>
-            <button class="back-btn" style="width:100%; margin-top:10px;" onclick="showScreen('home-screen')">CANCEL</button>
+            <button class="main-btn btn-buy" style="width:100%" onclick="login()">ENTER</button>
+            <button class="back-btn" style="width:100%; margin-top:10px;" onclick="showScreen('home-screen')">BACK</button>
         </div>
     </div>
 
@@ -92,18 +96,18 @@
         <div class="black-section">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <button class="back-btn" onclick="showScreen('home-screen')">BACK</button>
-                <h2 style="margin:0;">Marketplace</h2>
+                <h2 style="margin:0;">Explore</h2>
                 <button class="admin-only" style="background:#0088ff; color:white; border:none; padding:8px 12px; border-radius:5px;" onclick="showScreen('manage-cat-screen')">⚙️</button>
             </div>
             <div class="category-bar" id="filter-bar"></div>
         </div>
-        <div id="list">Loading...</div>
+        <div id="list">Loading Items...</div>
     </div>
 
     <div id="sell-screen" class="screen">
         <div class="black-section">
             <button class="back-btn" onclick="showScreen('home-screen')">BACK</button>
-            <h2 style="display:inline; margin-left:15px;">Post Ad</h2>
+            <h2 style="display:inline; margin-left:15px;">Post New Ad</h2>
         </div>
         <div class="box">
             <input type="text" id="title" placeholder="Item Name">
@@ -111,7 +115,7 @@
             <input type="text" id="wa-num" placeholder="WhatsApp (9477xxxxxxx)">
             <select id="post-cat"></select>
             <input type="file" id="imgInp" accept="image/*">
-            <button class="main-btn btn-sell" style="width:100%" id="pub" onclick="publish()">🚀 POST NOW</button>
+            <button class="main-btn btn-sell" style="width:100%" id="pub" onclick="publish()">🚀 PUBLISH NOW</button>
         </div>
     </div>
 
@@ -121,15 +125,16 @@
             <h2 style="display:inline; margin-left:15px;">Categories</h2>
         </div>
         <div class="box">
-            <input type="text" id="new-cat-name" placeholder="Category Name">
-            <button class="main-btn btn-buy" style="width:100%" onclick="addCategory()">ADD</button>
-            <div id="cat-list-admin" style="margin-top:20px;"></div>
+            <input type="text" id="new-cat-name" placeholder="Category Name (Ex: Trousers)">
+            <button class="main-btn btn-buy" style="width:100%" onclick="addCategory()">ADD CATEGORY</button>
+            <hr style="border:0.5px solid #333; margin:20px 0;">
+            <div id="cat-list-admin"></div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, remove, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBxuxJas8r3_RWcq-Pc-oXpsesVPc-CEHo",
@@ -154,28 +159,52 @@
             if(document.getElementById('user').value === "anything.lk" && document.getElementById('pass').value === "9999") {
                 isAdmin = true;
                 document.getElementById('main-body').classList.add('admin-mode');
-                alert("Login Success!");
+                alert("Welcome Boss!");
                 showScreen('buy-screen');
-            } else alert("Access Denied!");
+            } else alert("Invalid Credentials!");
         };
 
+        // Category පෙන්වන කොටස (Real-time)
         onValue(ref(db, 'categories'), (snap) => {
             const cats = [];
             snap.forEach(c => cats.push({id: c.key, name: c.val().name}));
+            
+            // Sell screen එකේ Dropdown එක
             document.getElementById('post-cat').innerHTML = cats.map(c => `<option>${c.name}</option>`).join('');
+            
+            // Filter Bar එක
             const fBar = document.getElementById('filter-bar');
             fBar.innerHTML = `<button class="cat-btn active-cat" onclick="filterAds('All', this)">All</button>`;
             cats.forEach(c => fBar.innerHTML += `<button class="cat-btn" onclick="filterAds('${c.name}', this)">${c.name}</button>`);
+            
+            // Admin Category List එක (Delete කරන්න පුළුවන් විදිහට)
             const aList = document.getElementById('cat-list-admin');
-            aList.innerHTML = cats.map(c => `<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>${c.name}</span><button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; border-radius:4px; padding:2px 8px;">Del</button></div>`).join('');
+            aList.innerHTML = cats.map(c => `
+                <div class="cat-item">
+                    <span>${c.name}</span>
+                    <button onclick="deleteCategory('${c.id}')" style="background:#ff4444; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Delete</button>
+                </div>
+            `).join('');
         });
 
+        // අලුත් Category එකක් ඇඩ් කරන Function එක (Fixed)
         window.addCategory = () => {
-            const name = document.getElementById('new-cat-name').value;
-            if(name) { set(push(ref(db, 'categories')), { name: name }); document.getElementById('new-cat-name').value = ""; }
+            const nameInput = document.getElementById('new-cat-name');
+            const name = nameInput.value.trim();
+            if(name) {
+                // මෙතනදී push() පාවිච්චි කරන නිසා පරණ ඒවා මැකෙන්නේ නැහැ
+                push(ref(db, 'categories'), { name: name })
+                .then(() => {
+                    nameInput.value = "";
+                    alert("Category Added!");
+                })
+                .catch((error) => alert("Error: " + error.message));
+            } else {
+                alert("Please enter a name!");
+            }
         };
 
-        window.deleteCategory = (id) => { if(confirm("Delete?")) remove(ref(db, 'categories/' + id)); };
+        window.deleteCategory = (id) => { if(confirm("Delete this category?")) remove(ref(db, 'categories/' + id)); };
 
         window.publish = async () => {
             const f = document.getElementById('imgInp').files[0];
@@ -184,21 +213,21 @@
             let phone = document.getElementById('wa-num').value;
             const btn = document.getElementById('pub');
 
-            if(!f || !title || !price || !phone) return alert("Fill all fields!");
+            if(!f || !title || !price || !phone) return alert("All fields are required!");
             phone = phone.replace('+', '').replace(/\s/g, ''); 
 
-            btn.innerText = "Processing..."; btn.disabled = true;
+            btn.innerText = "Uploading..."; btn.disabled = true;
             let fd = new FormData(); fd.append("image", f);
             const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMG_KEY}`, { method: "POST", body: fd });
             const data = await res.json();
 
-            await set(push(ref(db, 'ads')), {
+            await push(ref(db, 'ads'), {
                 name: title, price: price, phone: phone,
                 category: document.getElementById('post-cat').value,
                 img: data.data.url, time: Date.now()
             });
-            alert("Success!"); showScreen('buy-screen');
-            btn.innerText = "🚀 POST NOW"; btn.disabled = false;
+            alert("Ad Live!"); showScreen('buy-screen');
+            btn.innerText = "🚀 PUBLISH NOW"; btn.disabled = false;
         };
 
         let allAds = [];
@@ -211,15 +240,15 @@
             const list = document.getElementById('list');
             list.innerHTML = "";
             ads.sort((a,b) => b.time - a.time).forEach(item => {
-                const msg = encodeURIComponent(`Hello, I'm interested in: ${item.name} (Rs. ${item.price})`);
+                const msg = encodeURIComponent(`Interested in: ${item.name} (Rs. ${item.price})`);
                 const waLink = `https://wa.me/${item.phone}?text=${msg}`;
                 list.innerHTML += `
                     <div class="card">
                         <img src="${item.img}">
                         <h4>${item.name}</h4>
-                        <p style="color:#00ff00;">Rs. ${item.price}</p>
+                        <p style="color:#00ff00; font-weight:bold;">Rs. ${item.price}</p>
                         <a href="${waLink}" class="wa-link" target="_blank">💬 WhatsApp</a>
-                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; border:none; color:white; margin-top:5px; border-radius:5px; padding:3px; width:100%;">Delete</button>` : ''}
+                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; border:none; color:white; margin-top:8px; border-radius:5px; padding:5px; width:90%; cursor:pointer;">Delete Ad</button>` : ''}
                     </div>`;
             });
         };
@@ -230,7 +259,7 @@
             renderAds(cat === 'All' ? allAds : allAds.filter(a => a.category === cat));
         };
 
-        window.deleteAd = (id) => { if(confirm("Delete?")) remove(ref(db, 'ads/' + id)); };
+        window.deleteAd = (id) => { if(confirm("Remove this ad?")) remove(ref(db, 'ads/' + id)); };
     </script>
 </body>
 </html>
