@@ -15,7 +15,7 @@
         header { background: #000; padding: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; z-index: 9999; }
         header span { font-size: 26px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
 
-        .screen { display: none; padding: 20px; animation: fadeIn 0.4s ease-in; position: relative; z-index: 1000; }
+        .screen { display: none; padding: 20px; animation: fadeIn 0.3s ease-in; position: relative; z-index: 1000; }
         .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -41,7 +41,7 @@
 
         .admin-nav-link {
             display: block; text-align: right; font-size: 11px; color: #666; 
-            margin-bottom: 20px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 20px; font-weight: bold; text-transform: uppercase;
         }
 
         .wa-link {
@@ -71,8 +71,6 @@
 </head>
 <body id="main-body">
 
-    <script src="https://pl29015647.profitablecpmratenetwork.com/8c/da/80/8cda80fee130449719e6e901610aded0.js"></script>
-
     <header><span>ANYTHING.LK</span></header>
 
     <div id="home-screen" class="screen active">
@@ -101,13 +99,13 @@
             </div>
             <div class="category-bar" id="filter-bar"></div>
         </div>
-        <div id="list">Loading Items...</div>
+        <div id="list">Loading...</div>
     </div>
 
     <div id="sell-screen" class="screen">
         <div class="black-section">
             <button class="back-btn" onclick="showScreen('home-screen')">BACK</button>
-            <h2 style="display:inline; margin-left:15px;">Post New Ad</h2>
+            <h2 style="display:inline; margin-left:15px;">Post Ad</h2>
         </div>
         <div class="box">
             <input type="text" id="title" placeholder="Item Name">
@@ -125,7 +123,7 @@
             <h2 style="display:inline; margin-left:15px;">Categories</h2>
         </div>
         <div class="box">
-            <input type="text" id="new-cat-name" placeholder="Category Name (Ex: Trousers)">
+            <input type="text" id="new-cat-name" placeholder="Category Name">
             <button class="main-btn btn-buy" style="width:100%" onclick="addCategory()">ADD CATEGORY</button>
             <hr style="border:0.5px solid #333; margin:20px 0;">
             <div id="cat-list-admin"></div>
@@ -134,7 +132,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, remove, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBxuxJas8r3_RWcq-Pc-oXpsesVPc-CEHo",
@@ -161,51 +159,41 @@
                 document.getElementById('main-body').classList.add('admin-mode');
                 alert("Welcome Boss!");
                 showScreen('buy-screen');
-            } else alert("Invalid Credentials!");
+            } else alert("Invalid Login!");
         };
 
-        // Category පෙන්වන කොටස (Real-time)
+        // Categories පෙන්වීම සහ කළමනාකරණය
         onValue(ref(db, 'categories'), (snap) => {
             const cats = [];
-            snap.forEach(c => cats.push({id: c.key, name: c.val().name}));
+            snap.forEach(c => { cats.push({id: c.key, name: c.val().name}); });
             
-            // Sell screen එකේ Dropdown එක
             document.getElementById('post-cat').innerHTML = cats.map(c => `<option>${c.name}</option>`).join('');
             
-            // Filter Bar එක
             const fBar = document.getElementById('filter-bar');
             fBar.innerHTML = `<button class="cat-btn active-cat" onclick="filterAds('All', this)">All</button>`;
             cats.forEach(c => fBar.innerHTML += `<button class="cat-btn" onclick="filterAds('${c.name}', this)">${c.name}</button>`);
             
-            // Admin Category List එක (Delete කරන්න පුළුවන් විදිහට)
             const aList = document.getElementById('cat-list-admin');
             aList.innerHTML = cats.map(c => `
                 <div class="cat-item">
                     <span>${c.name}</span>
-                    <button onclick="deleteCategory('${c.id}')" style="background:#ff4444; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Delete</button>
+                    <button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; padding:5px; border-radius:5px;">Del</button>
                 </div>
             `).join('');
         });
 
-        // අලුත් Category එකක් ඇඩ් කරන Function එක (Fixed)
+        // Category එකතු කිරීම (Fixed push method)
         window.addCategory = () => {
-            const nameInput = document.getElementById('new-cat-name');
-            const name = nameInput.value.trim();
+            const name = document.getElementById('new-cat-name').value;
             if(name) {
-                // මෙතනදී push() පාවිච්චි කරන නිසා පරණ ඒවා මැකෙන්නේ නැහැ
-                push(ref(db, 'categories'), { name: name })
-                .then(() => {
-                    nameInput.value = "";
-                    alert("Category Added!");
-                })
-                .catch((error) => alert("Error: " + error.message));
-            } else {
-                alert("Please enter a name!");
+                push(ref(db, 'categories'), { name: name });
+                document.getElementById('new-cat-name').value = "";
             }
         };
 
-        window.deleteCategory = (id) => { if(confirm("Delete this category?")) remove(ref(db, 'categories/' + id)); };
+        window.deleteCategory = (id) => { if(confirm("Delete?")) remove(ref(db, 'categories/' + id)); };
 
+        // Ad එකක් පෝස්ට් කිරීම
         window.publish = async () => {
             const f = document.getElementById('imgInp').files[0];
             const title = document.getElementById('title').value;
@@ -213,21 +201,22 @@
             let phone = document.getElementById('wa-num').value;
             const btn = document.getElementById('pub');
 
-            if(!f || !title || !price || !phone) return alert("All fields are required!");
+            if(!f || !title || !price || !phone) return alert("Fill all fields!");
             phone = phone.replace('+', '').replace(/\s/g, ''); 
 
-            btn.innerText = "Uploading..."; btn.disabled = true;
+            btn.innerText = "Processing..."; btn.disabled = true;
             let fd = new FormData(); fd.append("image", f);
             const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMG_KEY}`, { method: "POST", body: fd });
             const data = await res.json();
 
-            await push(ref(db, 'ads'), {
+            push(ref(db, 'ads'), {
                 name: title, price: price, phone: phone,
                 category: document.getElementById('post-cat').value,
                 img: data.data.url, time: Date.now()
+            }).then(() => {
+                alert("Success!"); showScreen('buy-screen');
+                btn.innerText = "🚀 PUBLISH NOW"; btn.disabled = false;
             });
-            alert("Ad Live!"); showScreen('buy-screen');
-            btn.innerText = "🚀 PUBLISH NOW"; btn.disabled = false;
         };
 
         let allAds = [];
@@ -240,15 +229,15 @@
             const list = document.getElementById('list');
             list.innerHTML = "";
             ads.sort((a,b) => b.time - a.time).forEach(item => {
-                const msg = encodeURIComponent(`Interested in: ${item.name} (Rs. ${item.price})`);
+                const msg = encodeURIComponent(`Interested in: ${item.name}`);
                 const waLink = `https://wa.me/${item.phone}?text=${msg}`;
                 list.innerHTML += `
                     <div class="card">
                         <img src="${item.img}">
                         <h4>${item.name}</h4>
-                        <p style="color:#00ff00; font-weight:bold;">Rs. ${item.price}</p>
+                        <p style="color:#00ff00;">Rs. ${item.price}</p>
                         <a href="${waLink}" class="wa-link" target="_blank">💬 WhatsApp</a>
-                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; border:none; color:white; margin-top:8px; border-radius:5px; padding:5px; width:90%; cursor:pointer;">Delete Ad</button>` : ''}
+                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; color:white; margin-top:5px; padding:5px; width:90%; border-radius:5px; border:none;">Delete</button>` : ''}
                     </div>`;
             });
         };
@@ -259,7 +248,7 @@
             renderAds(cat === 'All' ? allAds : allAds.filter(a => a.category === cat));
         };
 
-        window.deleteAd = (id) => { if(confirm("Remove this ad?")) remove(ref(db, 'ads/' + id)); };
+        window.deleteAd = (id) => { if(confirm("Delete Ad?")) remove(ref(db, 'ads/' + id)); };
     </script>
 </body>
 </html>
