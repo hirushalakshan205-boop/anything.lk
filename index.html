@@ -80,11 +80,6 @@
         <div style="height: 20px;"></div>
         <button class="main-btn btn-buy" onclick="showScreen('buy-screen')">🛒 BROWSE MARKET</button>
         <button class="main-btn btn-sell" onclick="showScreen('sell-screen')">➕ POST AN AD</button>
-        
-        <div style="margin-top: 30px; text-align: center;">
-            <script async="async" data-cfasync="false" src="//pl25915546.profitablecpmratenetwork.com/f5ab5e35c967dcc3125b27ecb3837b59/invoke.js"></script>
-            <div id="container-f5ab5e35c967dcc3125b27ecb3837b59"></div>
-        </div>
     </div>
 
     <div id="login-screen" class="screen">
@@ -106,7 +101,7 @@
             </div>
             <div class="category-bar" id="filter-bar"></div>
         </div>
-        <div id="list">Loading Items...</div>
+        <div id="list">Loading...</div>
     </div>
 
     <div id="sell-screen" class="screen">
@@ -139,9 +134,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Firebase Configuration (From User Summary)
         const firebaseConfig = {
             apiKey: "AIzaSyBxuxJas8r3_RWcq-Pc-oXpsesVPc-CEHo",
             authDomain: "anything-5beb7.firebaseapp.com",
@@ -155,6 +149,7 @@
         const IMG_KEY = "b5c90bc5900ba7e407f4467601971745";
         let isAdmin = false;
 
+        // සියලුම functions window object එකට සම්බන්ධ කළා
         window.showScreen = (id) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -165,90 +160,69 @@
             if(document.getElementById('user').value === "anything.lk" && document.getElementById('pass').value === "9999") {
                 isAdmin = true;
                 document.getElementById('main-body').classList.add('admin-mode');
-                alert("Welcome Boss!");
+                alert("Welcome Admin!");
                 showScreen('buy-screen');
+                renderAds(allAds); // Admin වුණාම Delete buttons පේන්න refresh කරනවා
             } else alert("Invalid Login!");
         };
 
-        // Real-time Category Loading & Management
         onValue(ref(db, 'categories'), (snap) => {
             const cats = [];
             snap.forEach(c => { cats.push({id: c.key, name: c.val().name}); });
-            
             document.getElementById('post-cat').innerHTML = cats.map(c => `<option>${c.name}</option>`).join('');
-            
             const fBar = document.getElementById('filter-bar');
             fBar.innerHTML = `<button class="cat-btn active-cat" onclick="filterAds('All', this)">All</button>`;
             cats.forEach(c => fBar.innerHTML += `<button class="cat-btn" onclick="filterAds('${c.name}', this)">${c.name}</button>`);
-            
             const aList = document.getElementById('cat-list-admin');
             aList.innerHTML = cats.map(c => `
-                <div class="cat-item">
-                    <span>${c.name}</span>
-                    <button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">DEL</button>
-                </div>
+                <div class="cat-item"><span>${c.name}</span><button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; padding:5px; border-radius:5px;">DEL</button></div>
             `).join('');
         });
 
         window.addCategory = () => {
-            const name = document.getElementById('new-cat-name').value.trim();
-            if(name) {
-                push(ref(db, 'categories'), { name: name });
-                document.getElementById('new-cat-name').value = "";
-            } else alert("Enter a category name!");
+            const name = document.getElementById('new-cat-name').value;
+            if(name) { push(ref(db, 'categories'), { name: name }); document.getElementById('new-cat-name').value = ""; }
         };
 
-        window.deleteCategory = (id) => { if(confirm("Category එක අයින් කරන්නද?")) remove(ref(db, 'categories/' + id)); };
+        window.deleteCategory = (id) => { if(confirm("Delete Category?")) remove(ref(db, 'categories/' + id)); };
 
-        // --- Image Compression Logic ---
+        // --- FIXED IMAGE COMPRESSION & PREVIEW ---
         const compressImage = (file) => {
             return new Promise((resolve) => {
                 const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
+                reader.onload = (e) => {
                     const img = new Image();
-                    img.src = event.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 800; 
                         let width = img.width;
                         let height = img.height;
-
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        canvas.toBlob((blob) => {
-                            resolve(blob);
-                        }, 'image/jpeg', 0.7); // 70% Quality
+                        const max = 800;
+                        if (width > max) { height *= max / width; width = max; }
+                        canvas.width = width; canvas.height = height;
+                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.7);
                     };
+                    img.src = e.target.result;
                 };
+                reader.readAsDataURL(file);
             });
         };
 
         window.publish = async () => {
-            const fileInput = document.getElementById('imgInp');
+            const fileInp = document.getElementById('imgInp');
             const title = document.getElementById('title').value;
             const price = document.getElementById('price').value;
             let phone = document.getElementById('wa-num').value;
             const btn = document.getElementById('pub');
 
-            if(!fileInput.files[0] || !title || !price || !phone) return alert("Fill all fields!");
+            if(!fileInp.files[0] || !title || !price || !phone) return alert("All fields are required!");
             phone = phone.replace('+', '').replace(/\s/g, ''); 
 
-            btn.innerText = "Compressing & Uploading..."; btn.disabled = true;
+            btn.innerText = "Processing..."; btn.disabled = true;
 
             try {
-                const compressedBlob = await compressImage(fileInput.files[0]);
-                let fd = new FormData(); 
-                fd.append("image", compressedBlob, "product.jpg");
-
+                const compressed = await compressImage(fileInp.files[0]);
+                let fd = new FormData(); fd.append("image", compressed);
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMG_KEY}`, { method: "POST", body: fd });
                 const data = await res.json();
 
@@ -257,13 +231,9 @@
                     category: document.getElementById('post-cat').value,
                     img: data.data.url, time: Date.now()
                 });
-                alert("Ad is now Live!"); 
-                showScreen('buy-screen');
-            } catch (e) {
-                alert("Upload Failed. Try again!");
-            } finally {
-                btn.innerText = "🚀 PUBLISH NOW"; btn.disabled = false;
-            }
+                alert("Success!"); showScreen('buy-screen');
+            } catch (e) { alert("Error uploading!"); }
+            finally { btn.innerText = "🚀 PUBLISH NOW"; btn.disabled = false; }
         };
 
         let allAds = [];
@@ -276,15 +246,14 @@
             const list = document.getElementById('list');
             list.innerHTML = "";
             ads.sort((a,b) => b.time - a.time).forEach(item => {
-                const msg = encodeURIComponent(`Interested in: ${item.name} (Rs. ${item.price})`);
-                const waLink = `https://wa.me/${item.phone}?text=${msg}`;
+                const waLink = `https://wa.me/${item.phone}?text=Interested%20in%20${item.name}`;
                 list.innerHTML += `
                     <div class="card">
                         <img src="${item.img}">
-                        <h4 style="margin:10px 0 5px 0;">${item.name}</h4>
-                        <p style="color:#00ff00; font-weight:bold; margin:0;">Rs. ${item.price}</p>
+                        <h4>${item.name}</h4>
+                        <p style="color:#00ff00;">Rs. ${item.price}</p>
                         <a href="${waLink}" class="wa-link" target="_blank">💬 WhatsApp</a>
-                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; color:white; margin-top:8px; padding:5px; width:90%; border-radius:5px; border:none; cursor:pointer;">Delete Ad</button>` : ''}
+                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; color:white; margin-top:8px; padding:5px; width:90%; border-radius:5px; border:none; cursor:pointer; position:relative; z-index:99999;">DELETE AD</button>` : ''}
                     </div>`;
             });
         };
@@ -295,7 +264,7 @@
             renderAds(cat === 'All' ? allAds : allAds.filter(a => a.category === cat));
         };
 
-        window.deleteAd = (id) => { if(confirm("මෙම Ad එක අයින් කරන්නද?")) remove(ref(db, 'ads/' + id)); };
+        window.deleteAd = (id) => { if(confirm("Delete this Ad?")) remove(ref(db, 'ads/' + id)); };
     </script>
 </body>
 </html>
