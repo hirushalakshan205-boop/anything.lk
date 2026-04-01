@@ -68,6 +68,8 @@
             background: #111; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #222;
         }
     </style>
+
+    <script type='text/javascript' src='//pl25915647.profitablecpmratenetwork.com/8c/da/80/8cda80fee130449719e6e901610aded0.js'></script>
 </head>
 <body id="main-body">
 
@@ -78,6 +80,11 @@
         <div style="height: 20px;"></div>
         <button class="main-btn btn-buy" onclick="showScreen('buy-screen')">🛒 BROWSE MARKET</button>
         <button class="main-btn btn-sell" onclick="showScreen('sell-screen')">➕ POST AN AD</button>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <script async="async" data-cfasync="false" src="//pl25915546.profitablecpmratenetwork.com/f5ab5e35c967dcc3125b27ecb3837b59/invoke.js"></script>
+            <div id="container-f5ab5e35c967dcc3125b27ecb3837b59"></div>
+        </div>
     </div>
 
     <div id="login-screen" class="screen">
@@ -99,7 +106,7 @@
             </div>
             <div class="category-bar" id="filter-bar"></div>
         </div>
-        <div id="list">Loading...</div>
+        <div id="list">Loading Items...</div>
     </div>
 
     <div id="sell-screen" class="screen">
@@ -149,7 +156,7 @@
 
         window.showScreen = (id) => {
             document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-            document.getElementById(id).style.display = 'block';
+            document.getElementById(id).classList.add('active');
             window.scrollTo(0,0);
         };
 
@@ -162,7 +169,7 @@
             } else alert("Invalid Login!");
         };
 
-        // Categories පෙන්වීම සහ කළමනාකරණය
+        // Real-time Category Loader
         onValue(ref(db, 'categories'), (snap) => {
             const cats = [];
             snap.forEach(c => { cats.push({id: c.key, name: c.val().name}); });
@@ -177,12 +184,11 @@
             aList.innerHTML = cats.map(c => `
                 <div class="cat-item">
                     <span>${c.name}</span>
-                    <button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; padding:5px; border-radius:5px;">Del</button>
+                    <button onclick="deleteCategory('${c.id}')" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px;">DELETE</button>
                 </div>
             `).join('');
         });
 
-        // Category එකතු කිරීම (Fixed push method)
         window.addCategory = () => {
             const name = document.getElementById('new-cat-name').value;
             if(name) {
@@ -191,9 +197,8 @@
             }
         };
 
-        window.deleteCategory = (id) => { if(confirm("Delete?")) remove(ref(db, 'categories/' + id)); };
+        window.deleteCategory = (id) => { if(confirm("අයින් කරන්නද?")) remove(ref(db, 'categories/' + id)); };
 
-        // Ad එකක් පෝස්ට් කිරීම
         window.publish = async () => {
             const f = document.getElementById('imgInp').files[0];
             const title = document.getElementById('title').value;
@@ -234,10 +239,10 @@
                 list.innerHTML += `
                     <div class="card">
                         <img src="${item.img}">
-                        <h4>${item.name}</h4>
-                        <p style="color:#00ff00;">Rs. ${item.price}</p>
+                        <h4 style="margin:10px 0 5px 0;">${item.name}</h4>
+                        <p style="color:#00ff00; font-weight:bold; margin:0;">Rs. ${item.price}</p>
                         <a href="${waLink}" class="wa-link" target="_blank">💬 WhatsApp</a>
-                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; color:white; margin-top:5px; padding:5px; width:90%; border-radius:5px; border:none;">Delete</button>` : ''}
+                        ${isAdmin ? `<button onclick="deleteAd('${item.id}')" style="background:red; color:white; margin-top:8px; padding:5px; width:90%; border-radius:5px; border:none; cursor:pointer;">Delete Ad</button>` : ''}
                     </div>`;
             });
         };
@@ -248,7 +253,7 @@
             renderAds(cat === 'All' ? allAds : allAds.filter(a => a.category === cat));
         };
 
-        window.deleteAd = (id) => { if(confirm("Delete Ad?")) remove(ref(db, 'ads/' + id)); };
+        window.deleteAd = (id) => { if(confirm("Delete this Ad?")) remove(ref(db, 'ads/' + id)); };
     </script>
 </body>
 </html>
